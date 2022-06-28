@@ -1,6 +1,7 @@
 """Initialize E-Commerce app."""
 import os
 from flask import Flask
+from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login.login_manager import LoginManager
@@ -8,6 +9,7 @@ from flask_login.login_manager import LoginManager
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
+mail = Mail()
 
 def create_app():
     """Construct the core application."""
@@ -15,6 +17,7 @@ def create_app():
     app.config.from_object("config.Config")
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     login_manager.login_view="login"
     login_manager.login_message_category="info"

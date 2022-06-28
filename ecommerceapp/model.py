@@ -12,9 +12,9 @@ class UserType(enum.Enum):
     customer = "Customer"
 
 class Gender(enum.Enum):
+    NA     = "Not mentioned"
     male   = "Male"
     female = "Female"
-    NA     = "Not mentioned"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -34,4 +34,4 @@ class User(db.Model,UserMixin):
     confirmed_on = db.Column(db.DateTime, nullable=True)
     
     def __repr__(self):
-        return f"Username is {self.username}"
+        return f"Username is {self.firstname}"

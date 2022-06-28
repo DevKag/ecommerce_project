@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from ecommerceapp.model import User
 
 UserType = [('customer','Customer'),('admin', 'Admin'),('shopuser','ShopUser')]
-Gender   = [('male', 'Male'), ('female', 'Female'), ('NA','Not Mentioned')]
+Gender   = [('NA','Not Mentioned'), ('male', 'Male'), ('female', 'Female')]
 
 class RegistrationForm(FlaskForm):
     firstname        = StringField('First Name',validators=[DataRequired(), Length(min=2, max=20)])
@@ -33,3 +33,26 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit   = SubmitField('Sign in')
+
+class EmailForm(FlaskForm):
+    email   = StringField('Email', validators=[DataRequired(), Email()])
+    submit  = SubmitField('Submit Email')
+
+class PasswordForm(FlaskForm):
+    password         = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password',validators=[DataRequired(), EqualTo('password')])
+    submit           = SubmitField('Submit Password')
+
+class UpdateAccountForm(FlaskForm):
+    firstname = StringField('First Name',validators=[DataRequired(), Length(min=2, max=20)])
+    lastname  = StringField('Last Name',validators=[DataRequired(), Length(min=2, max=20)])
+    email     = StringField('Email',validators=[DataRequired(), Email()])
+    dob       = DateField('DOB', validators=[DataRequired()])
+    gender    = SelectField('Gender', choices=Gender)
+    submit    = SubmitField('Update')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('That email is taken. Please choose a different one.')

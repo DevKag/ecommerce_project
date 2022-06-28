@@ -20,3 +20,16 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"mysql://{environ.get('USER')}:{environ.get('PASSWORD')}@{environ.get('HOST')}/{environ.get('DATABASE')}"
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Mail settings
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 465
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+
+    # gmail authentication
+    MAIL_USERNAME = environ.get('APP_MAIL_USERNAME')
+    MAIL_PASSWORD = environ.get('APP_MAIL_PASSWORD')
+
+    # mail accounts
+    MAIL_DEFAULT_SENDER = 'dkag@decode.com'

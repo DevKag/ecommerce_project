@@ -37,7 +37,7 @@ After request Approval by the Admin Shop user can List/Add/update/delete the pro
 11) Customers can see the products on landing page.
 Only customers can buy the published products. Only Shop users can sell the product.
 
-12)Apply filter and sorting on product page for customers.
+12) Apply filter and sorting on product page for customers.
 Filter the product according to categories, company and filter on the prices, brand, color, material. Sort the product according to price, rating. Search with text. Pagination should be there.
 
 13) customers can add/remove products to their wishlist.
@@ -66,7 +66,7 @@ Admin user can see the shop's product sales according to category, brand, shops.
 
 Optional:
 Signup/login via social sites.
-Global search for Product. categories, company and filter on the prices, brand, color, material. // optional.
+Global search for Product. categories, company and filter on the prices, brand, color, material. // Optional.
 On webapp landing page there will be the global search for the products.
 
 Stripe paymnet integration for buy products.

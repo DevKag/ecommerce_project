@@ -40,8 +40,12 @@
         <div class="form-group" style="text-align: center;">
             {{ form.submit(class="btn btn-outline-info") }}
         </div>
-            <small class="text-muted">
-            Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up Now</a>
-            </small>
+        <small class="text-muted">
+            Forgot Password ? <a class="ml-2" href="{{ url_for('reset') }}">Reset Password</a>
+        </small>
+        <br>
+        <small class="text-muted">
+        Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up Now</a>
+        </small>
     </form>
 {% endblock%}
