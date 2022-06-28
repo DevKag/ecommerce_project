@@ -6,8 +6,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms import IntegerField, DateField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from ecommerceapp.model import User
-
-UserType = [('customer','Customer'),('admin', 'Admin'),('shopuser','ShopUser')]
+UserType = [('customer','Customer'), ('shopuser','ShopUser')]
 Gender   = [('NA','Not Mentioned'), ('male', 'Male'), ('female', 'Female')]
 
 class RegistrationForm(FlaskForm):

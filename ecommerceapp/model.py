@@ -1,13 +1,8 @@
-from email.policy import default
 import enum
-
-from sqlalchemy import null
 from ecommerceapp import db, login_manager
-from flask_login import LoginManager, UserMixin
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 class UserType(enum.Enum):
-    admin    = "Admin"
     shopuser = "ShopUser"
     customer = "Customer"
 
@@ -15,6 +10,7 @@ class Gender(enum.Enum):
     NA     = "Not mentioned"
     male   = "Male"
     female = "Female"
+
 
 @login_manager.user_loader
 def load_user(user_id):

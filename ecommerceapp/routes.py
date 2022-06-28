@@ -1,4 +1,5 @@
 from os import abort
+from pdb import set_trace
 from flask import render_template, url_for, make_response, redirect, request, flash
 from flask import current_app as app
 from datetime import datetime
@@ -18,7 +19,7 @@ def home():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    form = RegistrationForm()
+    form = RegistrationForm(gender="male")
     if form.validate_on_submit():
         user = User(lastname=form.lastname.data,firstname=form.firstname.data, dob=form.dob.data, 
                     address=form.address.data, email=form.email.data, password=form.password.data, 
@@ -45,11 +46,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and form.password.data:
+        if user and form.password.data==user.password:
             if user.confirmed:
                 login_user(user, remember=form.remember.data)
-                flash('Login Successful!', 'success')
-                return redirect(url_for('home'))
+                next_page = request.args.get("next")
+                return redirect(next_page) if next_page else redirect(url_for('home'))
+                # flash('Login Successful!', 'success')
+                # return redirect(url_for('home'))
             else:
                 flash('Please confirmed your account by clicking link send on your mail', 'danger')
                 return render_template('login.html', title='Login', form=form) 
@@ -144,6 +147,6 @@ def account():
         form.firstname.data = current_user.firstname
         form.email.data = current_user.email
         form.dob.data = current_user.dob
-        form.gender.data = current_user.gender
+        form.gender.data = current_user.gender.name
     return render_template('account.html', title='Account',
                            form=form)
