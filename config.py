@@ -1,35 +1,54 @@
-"""Flask configuration variables."""
-from os import environ, path
+""" Flask app Configuration in all environment"""
 
+import os
 from dotenv import load_dotenv
 
-basedir = path.abspath(path.dirname(__file__))
-load_dotenv(path.join(basedir, ".env"))
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, ".env"))
 
 class Config:
-    """Set Flask configuration from .env file."""
+    """
+    Base configuration class. Contains default configuration settings
+    + configuration settings applicable to all environments.
+    """
+    # Default settings
+    FLASK_ENV = 'development'
+    DEBUG = False
+    TESTING = False
+    WTF_CSRF_ENABLED = True
 
-    # General Config
-    SECRET_KEY = environ.get("SECRET_KEY")
-    FLASK_APP = environ.get("FLASK_APP")
-    FLASK_ENV = environ.get("FLASK_ENV")
-    SECURITY_PASSWORD_SALT = environ.get("SECURITY_PASSWORD_SALT")
+    # Settings applicable to all environments
+    SECRET_KEY = os.environ.get('SECRET_KEY', default='A very terrible secret key.')
 
-    # Database
-    SQLALCHEMY_DATABASE_URI = f"mysql://{environ.get('USER')}:{environ.get('PASSWORD')}@{environ.get('HOST')}/{environ.get('DATABASE')}"
-    SQLALCHEMY_ECHO = False
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    # Mail settings
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 465
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME', default='')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', default='')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME', default='')
+    MAIL_SUPPRESS_SEND = False
 
-    # gmail authentication
-    MAIL_USERNAME = environ.get('APP_MAIL_USERNAME')
-    MAIL_PASSWORD = environ.get('APP_MAIL_PASSWORD')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT', default=' ')
 
-    # mail accounts
-    MAIL_DEFAULT_SENDER = 'dkag@decode.com'
+
+class DevelopmentConfig(Config):
+    """ Defining Development Config """
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
+
+class TestingConfig(Config):
+    """ Defining Test Config """
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    MAIL_SUPPRESS_SEND = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URI',
+                                default=DevelopmentConfig.SQLALCHEMY_DATABASE_URI)
+
+class ProductionConfig(Config):
+    """ Defining Production Config """
+    FLASK_ENV = 'production'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('PRODUCTION_DATABASE_URI',
+    default=DevelopmentConfig.SQLALCHEMY_DATABASE_URI)

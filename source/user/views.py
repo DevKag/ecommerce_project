@@ -1,48 +1,55 @@
+""" The User App views """
 from os import abort
-from pdb import set_trace
-from flask import render_template, url_for, make_response, redirect, request, flash
-from flask import current_app as app
 from datetime import datetime
+
+from flask import render_template, url_for, redirect, request, flash
 from flask_login import current_user, login_user, logout_user, login_required
-from ecommerceapp import db
-from ecommerceapp.forms import RegistrationForm, LoginForm, EmailForm, PasswordForm, UpdateAccountForm
-from ecommerceapp.model import User
-from ecommerceapp.token import generate_confirmation_token, confirm_token
-from ecommerceapp.email import send_email
+from source import db, login_manager
+from source.user.forms import RegistrationForm, LoginForm, EmailForm, PasswordForm
+from source.user.forms import  UpdateAccountForm
+from source.user.models import User
+from source.utils import generate_confirmation_token, confirm_token
+from source.email import send_email
 
-@app.route('/home')
-@app.route('/')
-def home():
-    return render_template('home.html')
+from . import auth_blueprint
 
-@app.route("/register", methods=['GET', 'POST'])
+
+@login_manager.user_loader
+def load_user(user_id):
+    """ User loader """
+    return User.query.get(int(user_id))
+
+
+@auth_blueprint.route("/register", methods=['GET', 'POST'])
 def register():
+    """ Registration Page Logic """
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    form = RegistrationForm(gender="male")
+        return redirect(url_for('main.home'))
+    form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(lastname=form.lastname.data,firstname=form.firstname.data, dob=form.dob.data, 
-                    address=form.address.data, email=form.email.data, password=form.password.data, 
-                    confirmed=False)
+        user = User(lastname=form.lastname.data,firstname=form.firstname.data,
+                dob=form.dob.data, address=form.address.data, email=form.email.data,
+                password=form.password.data, confirmed=False)
         db.session.add(user)
         db.session.commit()
 
         token = generate_confirmation_token(user.email)
 
-        confirm_url = url_for('confirm_email', token=token, _external=True)
-        html = render_template('activate.html', confirm_url=confirm_url)
+        confirm_url = url_for('user.confirm_email', token=token, _external=True)
+        html = render_template('user/activate.html', confirm_url=confirm_url)
         subject = "Please confirm your email"
         send_email(user.email, subject, html)
 
         flash('A confirmation email has been sent via email.', 'success')
-        return redirect(url_for("home"))
-    return render_template('register.html', title='Register', form=form)
+        return redirect(url_for("main.home"))
+    return render_template('user/register.html', title='Register', form=form)
 
 
-@app.route("/login", methods=['GET', 'POST'])
+@auth_blueprint.route("/login", methods=['GET', 'POST'])
 def login():
+    """ Login Page logic """
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -50,24 +57,24 @@ def login():
             if user.confirmed:
                 login_user(user, remember=form.remember.data)
                 next_page = request.args.get("next")
-                return redirect(next_page) if next_page else redirect(url_for('home'))
-                # flash('Login Successful!', 'success')
-                # return redirect(url_for('home'))
-            else:
-                flash('Please confirmed your account by clicking link send on your mail', 'danger')
-                return render_template('login.html', title='Login', form=form) 
-        else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+                flash('Login Successful!', 'success')
+                return redirect(next_page) if next_page else redirect(url_for('main.home'))
 
-@app.route("/logout")
+            flash('Please confirmed your account by clicking link send on your mail', 'danger')
+            return render_template('login.html', title='Login', form=form)
+        flash('Login Unsuccessful. Please check username and password', 'danger')
+    return render_template('user/login.html', title='Login', form=form)
+
+@auth_blueprint.route("/logout")
 def logout():
+    """ Logout User Routes"""
     logout_user()
     flash('Logout Successful', 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('user.login'))
 
-@app.route('/confirm/<token>')
+@auth_blueprint.route('/confirm/<token>')
 def confirm_email(token):
+    """ Conformation Registration using email link"""
     try:
         email = confirm_token(token)
     except:
@@ -81,10 +88,11 @@ def confirm_email(token):
         db.session.add(user)
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
-@app.route('/reset', methods=["GET", "POST"])
+@auth_blueprint.route('/reset', methods=["GET", "POST"])
 def reset():
+    """ Forgot Password Routes"""
     form = EmailForm()
 
     if form.validate_on_submit():
@@ -99,21 +107,22 @@ def reset():
             _external=True)
 
         html = render_template(
-            'recover.html',
+            'user/recover.html',
             recover_url=recover_url)
 
         # Let's assume that send_email was defined in myapp/util.py
         send_email(user.email, subject, html)
 
-        return redirect(url_for('home'))
-    return render_template('reset.html', form=form)
+        return redirect(url_for('main.home'))
+    return render_template('user/reset.html', form=form)
 
 
-@app.route('/reset/<token>', methods=["GET", "POST"])
+@auth_blueprint.route('/reset/<token>', methods=["GET", "POST"])
 def reset_with_token(token):
+    """  Token Conformation for Password Reseting """
     try:
         email = confirm_token(token)
-    except:
+    except Exception:
         abort(404)
 
     form = PasswordForm()
@@ -124,14 +133,14 @@ def reset_with_token(token):
         user.password = form.password.data
         db.session.add(user)
         db.session.commit()
-
+        
         return redirect(url_for('login'))
-
     return render_template('reset_with_token.html', form=form, token=token)
 
-@app.route("/account", methods=['GET', 'POST'])
+@auth_blueprint.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
+    """ Account Updation """
     form = UpdateAccountForm()
     if form.validate_on_submit():
         current_user.lastname = form.lastname.data
@@ -141,12 +150,13 @@ def account():
         current_user.gender =  form.gender.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('account'))
-    elif request.method == 'GET':
+        return redirect(url_for('user.account'))
+    if request.method == 'GET':
         form.lastname.data = current_user.lastname
         form.firstname.data = current_user.firstname
         form.email.data = current_user.email
         form.dob.data = current_user.dob
         form.gender.data = current_user.gender.name
-    return render_template('account.html', title='Account',
+        # print(form.gender)
+    return render_template('user/account.html', title='Account',
                            form=form)
