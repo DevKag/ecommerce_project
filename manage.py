@@ -1,9 +1,10 @@
 """ File to define all deployment configuration"""
+from flask_migrate import upgrade, migrate, init, stamp
+from source import create_app, db
+
+
 def deploy():
     """ Run deployment tasks. """
-    from flask_migrate import upgrade, migrate, init, stamp
-    from source import create_app, db
-    from source.user.models import User
 
     app = create_app()
     app.app_context().push()
