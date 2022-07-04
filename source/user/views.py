@@ -88,12 +88,12 @@ class Logout(View):
 
 class Confirm_email(View):
     """ Conformation Registration using email link"""
-    def __init__(self, token):
-        self.token = token
+    # def __init__(self, token):
+    #     self.token = token
     
-    def dispatch_request(self):
+    def dispatch_request(self, token):
         try:
-            email = confirm_token(self.token)
+            email = confirm_token(token)
         except:
             flash('The confirmation link is invalid or has expired.', 'danger')
         user = User.query.filter_by(email=email).first_or_404()
@@ -121,7 +121,7 @@ class Reset(View):
             token = generate_confirmation_token(form.email.data)
 
             recover_url = url_for(
-                'reset_with_token',
+                'user.reset_with_token',
                 token=token,
                 _external=True)
 
@@ -131,18 +131,17 @@ class Reset(View):
 
             # Let's assume that send_email was defined in myapp/util.py
             send_email(user.email, subject, html)
-
+            flash('Reset password by clicking link sent on your Email', 'success')
             return redirect(url_for('main.home'))
         return render_template('user/reset.html', form=form)
 
 
 class ResetWithToken(View):
     """  Token Conformation for Password Reseting """
-    def __init__(self, token):
-        self.token = token
-    def dispatch_request(self):
+    methods=["GET", "POST"]
+    def dispatch_request(self, token):
         try:
-            email = confirm_token(self.token)
+            email = confirm_token(token)
         except Exception:
             abort(404)
 
@@ -154,9 +153,9 @@ class ResetWithToken(View):
             user.password = form.password.data
             db.session.add(user)
             db.session.commit()
-            
-            return redirect(url_for('login'))
-        return render_template('reset_with_token.html', form=form, token=self.token)
+            flash('Congratulation your password reset confirm', 'success')
+            return redirect(url_for('user.login'))
+        return render_template('user/reset_with_token.html', form=form, token=token)
 
 
 class Account(View):
@@ -188,7 +187,7 @@ auth_blueprint.add_url_rule('/register', view_func=Register.as_view(name='regist
 
 auth_blueprint.add_url_rule('/login', view_func=Login.as_view(name='login'))
 auth_blueprint.add_url_rule('/logout', view_func=Logout.as_view(name='logout'))
-auth_blueprint.add_url_rule('/confirm/<token>', view_func=Confirm_email.as_view(name='confirm_email',))
+auth_blueprint.add_url_rule('/confirm/<string:token>', view_func=Confirm_email.as_view('confirm_email'))
 auth_blueprint.add_url_rule('/reset', view_func=Reset.as_view(name='reset'))
-auth_blueprint.add_url_rule('/reset_with_token', view_func=ResetWithToken.as_view(name='reset_with_token'))
+auth_blueprint.add_url_rule('/reset_with_token/<token>', view_func=ResetWithToken.as_view(name='reset_with_token'))
 auth_blueprint.add_url_rule('/account', view_func=Account.as_view(name='account'))

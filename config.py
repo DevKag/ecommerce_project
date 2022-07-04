@@ -28,7 +28,7 @@ class Config:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME', default='')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', default='')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME', default='')
-    MAIL_SUPPRESS_SEND = False
+    MAIL_SUPPRESS_SEND = True
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT', default=' ')
