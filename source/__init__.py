@@ -51,9 +51,10 @@ def register_blueprints(app):
     """ Registering all blueprint in app instances """
     from source.user import auth_blueprint
     from source.main import main_blueprint
-
+    from command import admin_bp
     app.register_blueprint(auth_blueprint, url_prefix='/users')
     app.register_blueprint(main_blueprint)
+    app.register_blueprint(admin_bp)
 
 def initialize_database(app):
     """ Initializing databases """

@@ -6,9 +6,9 @@ from flask.views import View
 from flask import render_template, url_for, redirect, request, flash
 from flask_login import current_user, login_user, logout_user, login_required
 from source import db, login_manager
-from source.user.forms import RegistrationForm, LoginForm, EmailForm, PasswordForm
+from source.user.forms import RegistrationForm, LoginForm, EmailForm, PasswordForm, RequestForm
 from source.user.forms import  UpdateAccountForm
-from source.user.models import User
+from source.user.models import User, UserType
 from source.utils import generate_confirmation_token, confirm_token
 from source.email import send_email
 
@@ -18,7 +18,10 @@ from . import auth_blueprint
 @login_manager.user_loader
 def load_user(user_id):
     """ User loader """
-    return User.query.get(int(user_id))
+    user = User.query.get(int(user_id))
+    if user:
+        return user
+    return 
 
 
 class Register(View):
@@ -29,13 +32,29 @@ class Register(View):
             return redirect(url_for('main.home'))
         form = RegistrationForm()
         if form.validate_on_submit():
-            # print(form.usertype.data)
             if form.usertype.data == "shopuser":
                 user = User(lastname=form.lastname.data,firstname=form.firstname.data,
-                    dob=form.dob.data, address=form.address.data, email=form.email.data,
-                    password=form.password.data, confirmed=False)
-                # admin = User.query.filter_by(usertype="ADMIN")
-                # print(admin.email)
+                            dob=form.dob.data, address=form.address.data, email=form.email.data,
+                            password=form.password.data, confirmed=False)
+                db.session.add(user)
+                db.session.commit()
+                token = generate_confirmation_token(user.email)
+                confirm_url = url_for('user.confirm_email', token=token, _external=True)
+                html = render_template('user/activate.html', confirm_url=confirm_url)
+                subject = "Please confirm your email"
+                send_email(user.email, subject, html)
+                flash('A confirmation email has been sent via email.', 'success')
+
+                user_admin = User.query.filter_by(usertype=UserType.ADMIN.name).first()
+                print("admin",user.id)
+                approve_url = url_for('user.approval',id=user.id,  _external=True)
+                html = render_template('user/approve.html', confirm_url=approve_url)
+                subject = "This email is for approving shop registration"
+                send_email(user_admin.email, subject, html)
+                flash('An Approval email has been sent to admin via email.', 'success')
+                
+                return redirect(url_for("main.home"))
+
             else:               
                 user = User(lastname=form.lastname.data,firstname=form.firstname.data,
                         dob=form.dob.data, address=form.address.data, email=form.email.data,
@@ -55,6 +74,14 @@ class Register(View):
         
         return render_template('user/register.html', title='Register', form=form)
 
+class Approval(View):
+    print(id)
+    methods=['GET', 'POST']
+    def dispatch_request(self):
+        form = RequestForm()
+        user = User.query.get(id=id)
+        print(form.request_status.data)
+        return render_template('user/request.html', title='Approval', form=form)
 
 class Login(View):
     methods=['GET', 'POST']
@@ -65,6 +92,7 @@ class Login(View):
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
+            print(user)
             if user and form.password.data==user.password:
                 if user.confirmed:
                     login_user(user, remember=form.remember.data)
@@ -73,7 +101,7 @@ class Login(View):
                     return redirect(next_page) if next_page else redirect(url_for('main.home'))
 
                 flash('Please confirmed your account by clicking link send on your mail', 'danger')
-                return render_template('login.html', title='Login', form=form)
+                return render_template('user/login.html', title='Login', form=form)
             flash('Login Unsuccessful. Please check username and password', 'danger')
         return render_template('user/login.html', title='Login', form=form)
 
@@ -191,3 +219,4 @@ auth_blueprint.add_url_rule('/confirm/<string:token>', view_func=Confirm_email.a
 auth_blueprint.add_url_rule('/reset', view_func=Reset.as_view(name='reset'))
 auth_blueprint.add_url_rule('/reset_with_token/<token>', view_func=ResetWithToken.as_view(name='reset_with_token'))
 auth_blueprint.add_url_rule('/account', view_func=Account.as_view(name='account'))
+auth_blueprint.add_url_rule('/approval', view_func=Approval.as_view(name='approval'))

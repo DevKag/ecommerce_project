@@ -129,3 +129,7 @@ body {
   {
     display: inline;
   }
+
+  ul {
+    list-style-type: none !important;
+  }

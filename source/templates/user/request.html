@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4" style="text-align: center;">Request Approval</legend>
+            <div class="form-group">
+                {% if form.request_status.errors %}
+                    {{ form.request_status(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.request_status.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.request_status(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group" style="text-align: center;">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+{% endblock %}

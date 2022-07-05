@@ -1,9 +1,9 @@
 """ Form module for application"""
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import DateField, SelectField
+from wtforms import DateField, SelectField, RadioField
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, InputRequired
 
 from source.user.models import User
 from source.user.utils import Constant
@@ -67,3 +67,10 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('That email is taken. Please choose a different one.')
+            
+
+class RequestForm(FlaskForm):
+    """ Form for admin to approve or reject request """
+    request_status = RadioField('Request', choices=[(1,'Accept'), (0,'Reject')],
+                                default=0, coerce=int, validators=[InputRequired()])
+    submit         = SubmitField('Submit') 

@@ -14,4 +14,7 @@ def send_email(to_email, subject, template):
         html=template,
         sender=app.config['MAIL_DEFAULT_SENDER']
     )
-    mail.send(msg)
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print(e)
