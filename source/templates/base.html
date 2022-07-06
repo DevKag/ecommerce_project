@@ -40,6 +40,11 @@
                   <li><a class="dropdown-item" href="#">Genral</a></li>
                 </ul>
               </li>
+              {% if  current_user.usertype.name == 'ADMIN' %}
+                <li class="nav-item">
+                  <a class="nav-link active" href="{{url_for('user.approval')}}">Approval Requests</a>
+                </li>
+              {% endif %}
             </ul>
             <form class="d-flex" role="search">
               <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -49,7 +54,7 @@
               <li class="nav-item">
                 <a class="nav-link" href="#">Cart</a>
               </li>
-              {% if current_user.is_authenticated and current_user.confirmed%}
+              {% if current_user.is_authenticated and current_user.confirmed %}
                 <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('user.logout') }}">Logout</a>
                 </li>
@@ -59,7 +64,6 @@
                 </li>
               {% endif %}
             </ul>
-
           </div>
         </div>
       </nav>
@@ -90,7 +94,10 @@
     <script>
       window.setTimeout(function() {
         $(".alert").fadeOut(20) 
-    }, 4000);
+      }, 4000);
     </script>
+    {% block javascript %}
+    {% endblock %}
+
   </body>
 </html>

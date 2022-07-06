@@ -48,6 +48,7 @@ def create_user():
     email = click.prompt("Enter email", type=str)
     password  = click.prompt("Enter Password", type=str)
     user      = User(lastname=name, firstname=name, dob= None, address=None, email=email,
-                    password=password, usertype=UserType.ADMIN, gender=Gender.MALE, confirmed=True, approval=True)
+                    password=password, usertype=UserType.ADMIN, gender=Gender.MALE, 
+                    confirmed=True, approval=True, action=True)
     db.session.add(user)
     db.session.commit()

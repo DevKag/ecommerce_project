@@ -133,3 +133,7 @@ body {
   ul {
     list-style-type: none !important;
   }
+
+  .form-group.reason {
+    display: inline;
+  }

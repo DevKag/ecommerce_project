@@ -20,7 +20,7 @@ class Gender(enum.Enum):
     MALE   = "Male"
     FEMALE = "Female"
 
-class User(db.Model,UserMixin):
+class User(db.Model, UserMixin):
     """ User Database Table """
     id              = db.Column(db.Integer, primary_key=True)
     firstname       = db.Column(db.String(20), unique=False, nullable=False)
@@ -35,6 +35,7 @@ class User(db.Model,UserMixin):
     confirmed_on    = db.Column(db.DateTime, nullable=True)
     approval        = db.Column(db.Boolean, nullable=False, default=False)
     comment         = db.Column(db.String(200), nullable=True)
+    action          = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return f"Username is {self.firstname}"

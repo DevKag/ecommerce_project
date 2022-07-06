@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="card" style="width: auto;">
+        <div class="card-body">
+            <legend class="border-bottom mb-4" style="text-align: center;">Request Approval</legend>
+            <h5 class="card-title">Shop Details</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{user.firstname}} {{user.lastname}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">{{user.email}}</h6> 
+            <form method="post">
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <div class="form-group">
+                        {% if form.request_status.errors %}
+                            {{ form.request_status(class="form-control form-control-lg is-invalid", style="border: none;") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.request_status.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.request_status(class="form-control form-control-lg", style="border: none;") }}
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <fieldset class="form-group reason">
+                    <div class="form-group reason">
+                        {{ form.reason.label(class="form-control-label") }}
+                        {% if form.reason.errors %}
+                            {{ form.reason(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.reason.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.reason(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <div class="form-group" style="text-align: center;">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function(){ 
+            $(".reason").hide();
+            $("input[name='request_status']").change(function(){
+                var radioValue = $("input[name='request_status']:checked").val();
+                if(radioValue == 0){
+                    $(".reason").show();
+                }
+                else{
+                    $(".reason").hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -71,6 +71,7 @@ class UpdateAccountForm(FlaskForm):
 
 class RequestForm(FlaskForm):
     """ Form for admin to approve or reject request """
-    request_status = RadioField('Request', choices=[(1,'Accept'), (0,'Reject')],
-                                default=0, coerce=int, validators=[InputRequired()])
+    request_status = RadioField('Request', choices=[(0,'Reject'), (1,'Accept')],
+                                 coerce=int, validators=[InputRequired()])
+    reason = StringField('Reason')
     submit         = SubmitField('Submit') 
