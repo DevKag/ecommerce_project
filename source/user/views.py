@@ -96,12 +96,10 @@ class Login(View):
         """ Login Page logic """
         if current_user.is_authenticated:
             next_page = request.args.get("next")
-            print(next_page)
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            print(user)
             if user and form.password.data==user.password:
                 if user.confirmed:
                     login_user(user, remember=form.remember.data)
@@ -139,7 +137,6 @@ class Confirm_email(View):
         else:
             user.confirmed = True
             user.confirmed_on = datetime.now()
-            db.session.add(user)
             db.session.commit()
             flash('You have confirmed your account. Thanks!', 'success')
         return redirect(url_for('main.home'))
@@ -188,7 +185,6 @@ class ResetWithToken(View):
             user = User.query.filter_by(email=email).first_or_404()
 
             user.password = form.password.data
-            db.session.add(user)
             db.session.commit()
             flash('Congratulation your password reset confirm', 'success')
             return redirect(url_for('user.login'))
@@ -211,13 +207,13 @@ class Account(View):
             db.session.commit()
             flash('Your account has been updated!', 'success')
             return redirect(url_for('user.account'))
+
         if request.method == 'GET':
             form.lastname.data = current_user.lastname
             form.firstname.data = current_user.firstname
             form.email.data = current_user.email
             form.dob.data = current_user.dob
             form.gender.data = current_user.gender.name
-            # print(form.gender)
         return render_template('user/account.html', title='Account',
                             form=form)
 

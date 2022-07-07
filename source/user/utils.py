@@ -13,7 +13,7 @@ def admin_login_required(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if current_user.get_id():
-            if current_user.usertype.name == "ADMIN":
+            if current_user.is_admin():
                 return func(*args, **kwargs)
             else:
                 flash('Admin user login required.', 'danger')

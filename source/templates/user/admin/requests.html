@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Request Status</th>
+                <th>Action Status</th>
+                <th>Approval link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in context %}
+                <tr>
+                    <td>{{user.firstname}} {{user.lastname}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.approval}}</td>
+                    <td>{{user.action}}</td>
+                    <td> <a href="{{url_for('user.approval',id=user.id)}}">Link></a> </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+{% block  javascript %}
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable();
+        });
+    </script>
+{% endblock  %}
+

@@ -8,6 +8,5 @@ from . import main_blueprint
 def home():
     """ Home Page Views"""
     next_page = request.args.get("next")
-    print(next_page)
     # return redirect(next_page) if next_page else redirect(url_for('main.home'))
     return render_template('home.html')

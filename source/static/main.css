@@ -137,3 +137,8 @@ body {
   .form-group.reason {
     display: inline;
   }
+
+  div.container-shop {
+    width: 100%
+  }
+  

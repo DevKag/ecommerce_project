@@ -38,4 +38,16 @@ class User(db.Model, UserMixin):
     action          = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
-        return f"Username is {self.firstname}"
+        return self.firstname
+
+    def is_admin(self):
+        if self.usertype.name == "ADMIN":
+            return True
+        else:
+            return False
+    
+    def is_shop(self):
+        if self.usertype.name == "SHOPUSER":
+            return True
+        else:
+            return False
