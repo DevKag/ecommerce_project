@@ -56,7 +56,7 @@ class UpdateAccountForm(FlaskForm):
     """ For updating the user account """
     firstname = StringField('First Name',validators=[DataRequired(), Length(min=2, max=20)])
     lastname  = StringField('Last Name',validators=[DataRequired(), Length(min=2, max=20)])
-    email     = StringField('Email',validators=[DataRequired(), Email()])
+    email     = StringField('Email',validators=[DataRequired()])
     dob       = DateField('DOB', validators=[DataRequired()])
     gender    = SelectField('Gender', choices=Constant.Gender)
     submit    = SubmitField('Update')

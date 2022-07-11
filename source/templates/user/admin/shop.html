@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="container-shop">
-        <button id="addRow" href="#">Add New Shop</button>
+        <a href="{{ url_for('user.shop_registration') }}" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true">Add New Shop</a>
+        <!-- <button type="button" id ="addRow" href="{{ url_for('user.login') }}">Add New Shop</button> -->
         <table id="shop" class="display" style="width:100%">
             <thead>
                 <tr>
@@ -16,18 +17,23 @@
                     <tr>
                         <td>{{user.firstname}} {{user.lastname}}</td>
                         <td>{{user.email}}</td>
-                        <td>{{user.approval}}</td>
-                        <td>{{user.action}}</td>
+                        <td> <a href="{{url_for('user.shop_update',id=user.id)}}" id="update-{{user.id}}" class="btn btn-primary" role="button" aria-disabled="true" >Update</a> </td>
+                        <td> <a id="delete-{{user.id}}" class="btn btn-primary" role="button" aria-disabled="true" method='Delete'>Delete</a> </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
 {% endblock %}
 {% block  javascript %}
     <script>
         $(document).ready(function () {
             $('#shop').DataTable();
         });
+    </script>
+    
+    <script>
+        
     </script>
 {% endblock  %}
